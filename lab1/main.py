@@ -5,6 +5,7 @@ from sklearn.model_selection import train_test_split
 
 
 def load_dataset():
+    # SOURCE OF DATASET = https://www.kaggle.com/datasets/moneystore/agencyperformance
     df = pd.read_csv("dataset/insurance.csv")
     #print(df.head())
     #print(df.info())
