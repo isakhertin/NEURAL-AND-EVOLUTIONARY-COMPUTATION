@@ -37,24 +37,39 @@ class NeuralNet:
             return np.ones_like(x)
 
     # --- Framåtpass ---
-    def forward(self, X, func_name):
+    def forward(self, X, activation_hidden, activation_output):
         self.h = [None] * self.L
         self.xi[0] = X
         for l in range(1, self.L):
-            self.h[l] = np.dot(self.w[l], self.xi[l - 1]) - self.theta[l]
+            self.h[l] = np.dot(self.w[l], self.xi[l - 1]) + self.theta[l]
+            func_name = activation_output if l == self.L - 1 else activation_hidden
             self.xi[l] = self.activation(self.h[l], func_name)
         return self.xi[-1]
 
     # --- Träning (Backpropagation) ---
-    def fit(self, X, y, epochs=1000, lr=0.01, momentum=0.9, activation="sigmoid"):
+    def fit(
+        self,
+        X,
+        y,
+        epochs=1000,
+        lr=0.01,
+        momentum=0.9,
+        activation_hidden="sigmoid",
+        activation_output="linear",
+        shuffle=False,
+    ):
         for epoch in range(epochs):
             total_error = 0
-            for i in range(len(X)):
+            indices = np.arange(len(X))
+            if shuffle:
+                np.random.shuffle(indices)
+
+            for i in indices:
                 xi_input = X[i]
                 yi_target = y[i]
 
                 # Framåtpass
-                output = self.forward(xi_input, activation)
+                output = self.forward(xi_input, activation_hidden, activation_output)
 
                 # Bakåtpass
                 delta = [np.zeros(l) for l in self.n]
@@ -62,12 +77,14 @@ class NeuralNet:
                 total_error += np.mean(error**2)
 
                 # Delta för utlagret
-                delta[-1] = error * self.activation_derivative(self.h[-1], activation)
+                delta[-1] = error * self.activation_derivative(
+                    self.h[-1], activation_output
+                )
 
                 # Delta för dolda lager
                 for l in range(self.L - 2, 0, -1):
                     delta[l] = np.dot(self.w[l + 1].T, delta[l + 1]) * \
-                               self.activation_derivative(self.h[l], activation)
+                               self.activation_derivative(self.h[l], activation_hidden)
 
                 # Uppdatera vikter och bias
                 for l in range(1, self.L):
@@ -75,7 +92,7 @@ class NeuralNet:
                     d_theta = lr * delta[l] + momentum * self.d_theta_prev[l]
 
                     self.w[l] += d_w
-                    self.theta[l] -= d_theta
+                    self.theta[l] += d_theta
 
                     self.d_w_prev[l] = d_w
                     self.d_theta_prev[l] = d_theta
@@ -84,8 +101,10 @@ class NeuralNet:
                 print(f"Epoch {epoch+1}/{epochs}, Error: {total_error / len(X):.6f}")
 
     # --- Prediktion ---
-    def predict(self, X, activation="sigmoid"):
+    def predict(self, X, activation_hidden="sigmoid", activation_output="linear"):
         y_pred = []
         for i in range(len(X)):
-            y_pred.append(self.forward(X[i], activation))
+            y_pred.append(
+                self.forward(X[i], activation_hidden, activation_output)
+            )
         return np.array(y_pred)
