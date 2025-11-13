@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-
+import os
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.model_selection import train_test_split
 
@@ -9,7 +9,7 @@ from NeuralNet import NeuralNet
 
 def load_dataset():
     # SOURCE OF DATASET = https://www.kaggle.com/datasets/moneystore/agencyperformance
-    df = pd.read_csv("dataset/insurance.csv")
+    df = pd.read_csv("NEURAL-AND-EVOLUTIONARY-COMPUTATION/lab1/data/raw/insurance.csv")
     #print(df.head())
     #print(df.info())
     #print(df.describe())
