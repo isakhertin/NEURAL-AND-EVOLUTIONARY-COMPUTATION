@@ -3,13 +3,20 @@ import numpy as np
 import os
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.model_selection import train_test_split
+from pathlib import Path
 
 from NeuralNet import NeuralNet
 
 
+# Setting correct path to datafile
+base = Path(__file__).resolve().parents[1]  
+data_file = base / "data" / "raw" / "insurance.csv"
+
+
+
 def load_dataset():
     # SOURCE OF DATASET = https://www.kaggle.com/datasets/moneystore/agencyperformance
-    df = pd.read_csv("NEURAL-AND-EVOLUTIONARY-COMPUTATION/lab1/data/raw/insurance.csv")
+    df = pd.read_csv(data_file)
     #print(df.head())
     #print(df.info())
     #print(df.describe())
