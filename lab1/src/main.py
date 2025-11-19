@@ -59,7 +59,16 @@ def main():
         {"layers": [input_size, 20, 10, 5, 1], "epochs": 1500, "lr": 0.001, "mom": 0.9, "act": "tanh"},
     ]
 
-    for i, cfg in enumerate(configs):
+    configs2 = [
+        {"layers": [input_size, 8, 1], "epochs": 300, "lr": 0.01, "mom": 0.9, "act": "sigmoid"},
+        {"layers": [input_size, 9, 5, 1], "epochs": 800, "lr": 0.01, "mom": 0.9, "act": "sigmoid"},
+        {"layers": [input_size, 15, 10, 5, 1], "epochs": 1300, "lr": 0.001, "mom": 0.9, "act": "sigmoid"},
+    ]
+
+
+    #FOR THE TABLE
+
+    for i, cfg in enumerate(configs2):
 
         nn = NeuralNet(cfg["layers"], epochs=cfg["epochs"], lr=cfg["lr"], momentum=cfg["mom"], activation=cfg["act"])
     
@@ -90,8 +99,16 @@ def main():
     headers = ["Config", "Layers", "Epochs", "LR", "Mom", "Act", "MSE", "MAE", "MAPE"]
     print("\n\n===== FINAL RESULTS =====\n")
     print(tabulate(results, headers=headers, floatfmt=".6f"))
-        
-        
+    
+    #cfg = configs[8]
+    #nn = NeuralNet(cfg["layers"], epochs=cfg["epochs"], lr=cfg["lr"], momentum=cfg["mom"], activation=cfg["act"])
+    #nn.fit(X_train, y_train_scaled, shuffle=True)
+
+    # Predict on test data
+    y_pred_scaled = nn.predict(X_test).flatten()
+    y_pred_bp = y_pred_scaled * target_std + target_mean
+    ev.evaluate_model("BP (own)", y_test, y_pred_bp)
+
 
     #Train MLR
     print("Training MLR..")
